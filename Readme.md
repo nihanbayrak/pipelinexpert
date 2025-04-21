@@ -17,4 +17,6 @@ A specialized chatbot for pipeline product recommendations using Google's Gemini
 
 1. Clone the repository
 2. Install dependencies with `npm install`
-3. Create a `.env` file with your Gemini API key:
+3. Create a `.env` file with your Gemini API key
+4. Start the development server with `npm run dev`
+
