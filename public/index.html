@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Chatbot | 2025 Design</title>
+  <style>
+    :root {
+      --primary: #5856D6;
+      --primary-light: #7A79E0;
+      --surface: #ffffff;
+      --surface-alt: #f7f8fb;
+      --text: #1c1c1e;
+      --text-secondary: #6a6a6c;
+      --border: #e2e2e7;
+      --shadow: rgba(0, 0, 0, 0.05);
+      --accent: #ff375f;
+      --success: #34c759;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    }
+
+    body {
+      background-color: var(--surface-alt);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      background-color: var(--surface);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 600;
+      font-size: 18px;
+    }
+
+    .logo svg {
+      width: 32px;
+      height: 32px;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    .btn-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      color: var(--text-secondary);
+      transition: all 0.2s ease;
+    }
+
+    .btn-icon:hover {
+      background-color: var(--surface-alt);
+    }
+
+    main {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .message {
+      display: flex;
+      gap: 16px;
+      max-width: 80%;
+      animation: fade-in 0.3s ease-out;
+    }
+
+    @keyframes fade-in {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .message-user {
+      align-self: flex-end;
+      flex-direction: row-reverse;
+    }
+
+    .avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: var(--primary-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      color: white;
+      font-weight: 600;
+    }
+
+    .user-avatar {
+      background-color: var(--accent);
+    }
+
+    .message-content {
+      padding: 16px;
+      border-radius: 20px;
+      background-color: var(--surface);
+      box-shadow: 0 4px 12px var(--shadow);
+      line-height: 1.5;
+    }
+
+    .message-user .message-content {
+      background-color: var(--primary);
+      color: white;
+    }
+
+    .message-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 8px;
+      color: var(--text-secondary);
+      font-size: 12px;
+    }
+
+    .typing-indicator {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .typing-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: var(--text-secondary);
+      animation: typing 1.4s infinite;
+    }
+
+    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes typing {
+      0%, 60%, 100% { transform: translateY(0); }
+      30% { transform: translateY(-4px); }
+    }
+
+    footer {
+      padding: 16px 20px;
+      background-color: var(--surface);
+      border-top: 1px solid var(--border);
+    }
+
+    .composer {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background-color: var(--surface-alt);
+      border-radius: 30px;
+      padding: 8px 16px;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 8px var(--shadow);
+    }
+
+    .composer:focus-within {
+      box-shadow: 0 4px 12px var(--shadow);
+    }
+
+    .composer-input {
+      flex: 1;
+      border: none;
+      outline: none;
+      padding: 12px 0;
+      background: transparent;
+      font-size: 16px;
+      color: var(--text);
+    }
+
+    .composer-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .send-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transform-origin: center;
+      transition: all 0.2s ease;
+    }
+
+    .send-btn:hover {
+      background-color: var(--primary-light);
+      transform: scale(1.05);
+    }
+
+    .send-btn:active {
+      transform: scale(0.95);
+    }
+
+    .tools-btn {
+      color: var(--text-secondary);
+      background: transparent;
+      border: none;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .tools-btn:hover {
+      background-color: var(--border);
+    }
+
+    /* Status indicators */
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      background-color: var(--surface);
+      border: 1px solid var(--border);
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: var(--success);
+    }
+
+    /* Suggestion chips */
+    .suggestion-chips {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    .chip {
+      padding: 8px 16px;
+      border-radius: 20px;
+      background-color: var(--surface);
+      border: 1px solid var(--border);
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .chip:hover {
+      background-color: var(--primary-light);
+      color: white;
+      border-color: var(--primary-light);
+    }
+
+    /* Error message styles */
+    .error-message {
+      padding: 12px 16px;
+      border-radius: 10px;
+      background-color: #ffebee;
+      color: #d32f2f;
+      margin: 20px auto;
+      max-width: 80%;
+      text-align: center;
+      animation: fade-in 0.3s ease-out;
+      display: none;
+    }
+
+    /* Dark mode colors */
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --surface: #1c1c1e;
+        --surface-alt: #2c2c2e;
+        --text: #ffffff;
+        --text-secondary: #aeaeb2;
+        --border: #38383a;
+        --shadow: rgba(0, 0, 0, 0.2);
+      }
+    }
+
+    /* Responsive design */
+    @media (max-width: 768px) {
+      .message {
+        max-width: 90%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="10" fill="#5856D6" />
+          <path d="M8 12.5C8.82843 12.5 9.5 11.8284 9.5 11C9.5 10.1716 8.82843 9.5 8 9.5C7.17157 9.5 6.5 10.1716 6.5 11C6.5 11.8284 7.17157 12.5 8 12.5Z" fill="white" />
+          <path d="M16 12.5C16.8284 12.5 17.5 11.8284 17.5 11C17.5 10.1716 16.8284 9.5 16 9.5C15.1716 9.5 14.5 10.1716 14.5 11C14.5 11.8284 15.1716 12.5 16 12.5Z" fill="white" />
+          <path d="M15.5 15.5C15.5 15.5 14.5 17.5 12 17.5C9.5 17.5 8.5 15.5 8.5 15.5" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+        </svg>
+        <span>PipelineExpert</span>
+      </div>
+      <div class="header-actions">
+        <div class="status-pill">
+          <span class="status-dot"></span>
+          <span id="status-text">Online</span>
+        </div>
+        <button class="btn-icon" id="clear-chat">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M5 8V18C5 20.2091 6.79086 22 9 22H15C17.2091 22 19 20.2091 19 18V8M14 11V17M10 11V17M16 5L14.5937 2.8906C14.2228 2.3342 13.5983 2 12.9296 2H11.0704C10.4017 2 9.7772 2.3342 9.40627 2.8906L8 5M16 5H8M16 5H21M8 5H3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <main id="chat-container">
+      <div class="message">
+        <div class="avatar">
+          AI
+        </div>
+        <div>
+          <div class="message-content">
+            Hello! I'm PipelineExpert, your specialized AI for pipeline product recommendations. How can I help you find the optimal products for your system today?
+          </div>
+          <div class="message-meta" id="welcome-time"></div>
+        </div>
+      </div>
+      
+      <div class="error-message" id="error-message">
+        Sorry, there was an error connecting to the AI service. Please try again later.
+      </div>
+    </main>
+
+    <footer>
+      <div class="composer">
+        <button class="tools-btn" id="suggestions-btn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 12V12.01M12 6V6.01M12 18V18.01M12 9C13.1046 9 14 8.10457 14 7C14 5.89543 13.1046 5 12 5C10.8954 5 10 5.89543 10 7C10 8.10457 10.8954 9 12 9ZM12 15C13.1046 15 14 14.1046 14 13C14 11.8954 13.1046 11 12 11C10.8954 11 10 11.8954 10 13C10 14.1046 10.8954 15 12 15ZM12 21C13.1046 21 14 20.1046 14 19C14 17.8954 13.1046 17 12 17C10.8954 17 10 17.8954 10 19C10 20.1046 10.8954 21 12 21Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </button>
+        <input type="text" class="composer-input" id="user-input" placeholder="Type your message..." />
+        <div class="composer-actions">
+          <button class="tools-btn" id="upload-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 18C12 20.2091 10.2091 22 8 22C5.79086 22 4 20.2091 4 18C4 15.7909 5.79086 14 8 14C10.2091 14 12 15.7909 12 18Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+              <path d="M12 18V6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+              <path d="M16 9L20 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+              <path d="M20 9V5H16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </button>
+          <button class="send-btn" id="send-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M10.5 4.5L20.5 12L10.5 19.5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+              <path d="M3.5 12H20" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Set welcome message time
+      const now = new Date();
+      document.getElementById('welcome-time').textContent = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+      
+      // DOM elements
+      const chatContainer = document.getElementById('chat-container');
+      const userInput = document.getElementById('user-input');
+      const sendButton = document.getElementById('send-btn');
+      const clearButton = document.getElementById('clear-chat');
+      const suggestionsButton = document.getElementById('suggestions-btn');
+      const statusText = document.getElementById('status-text');
+      const errorMessage = document.getElementById('error-message');
+      
+      // Message history for context
+      let messageHistory = [];
+      
+      // Add the initial welcome message to history
+      messageHistory.push({
+        content: "Hello! I'm your AI assistant powered by Google AI. How can I help you today?",
+        isUser: false,
+        timestamp: new Date().toISOString()
+      });
+      
+      // Function to format time
+      function formatTime(timestamp) {
+        const date = new Date(timestamp);
+        return date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+      }
+      
+      // Function to add a message to the chat
+      function addMessage(content, isUser = false, timestamp = new Date().toISOString()) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${isUser ? 'message-user' : ''}`;
+        
+        messageDiv.innerHTML = `
+          <div class="avatar ${isUser ? 'user-avatar' : ''}">
+            ${isUser ? 'You' : 'AI'}
+          </div>
+          <div>
+            <div class="message-content">${content}</div>
+            <div class="message-meta">${formatTime(timestamp)}</div>
+          </div>
+        `;
+        
+        chatContainer.appendChild(messageDiv);
+        
+        // Save message to history
+        messageHistory.push({
+          content: content,
+          isUser: isUser,
+          timestamp: timestamp
+        });
+        
+        // Scroll to the bottom
+        messageDiv.scrollIntoView({ behavior: 'smooth' });
+        
+        return messageDiv;
+      }
+      
+      // Function to show typing indicator
+      function showTypingIndicator() {
+        const typingDiv = document.createElement('div');
+        typingDiv.className = 'message';
+        typingDiv.id = 'typing-indicator';
+        
+        typingDiv.innerHTML = `
+          <div class="avatar">
+            AI
+          </div>
+          <div class="message-content typing">
+            <div class="typing-indicator">
+              <div class="typing-dot"></div>
+              <div class="typing-dot"></div>
+              <div class="typing-dot"></div>
+            </div>
+          </div>
+        `;
+        
+        chatContainer.appendChild(typingDiv);
+        typingDiv.scrollIntoView({ behavior: 'smooth' });
+        
+        return typingDiv;
+      }
+      
+      // Function to remove typing indicator
+      function removeTypingIndicator() {
+        const indicator = document.getElementById('typing-indicator');
+        if (indicator) {
+          indicator.remove();
+        }
+      }
+      
+      // Function to show error
+      function showError(message) {
+        errorMessage.textContent = message;
+        errorMessage.style.display = 'block';
+        setTimeout(() => {
+          errorMessage.style.display = 'none';
+        }, 5000);
+      }
+      
+      // Function to send message to API
+      async function sendMessage(message) {
+        statusText.textContent = 'Processing...';
+        
+        try {
+          const response = await fetch('/api/chat', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              message: message,
+              history: messageHistory
+            }),
+          });
+          
+          if (!response.ok) {
+            throw new Error(`Server responded with ${response.status}`);
+          }
+          
+          const data = await response.json();
+          removeTypingIndicator();
+          addMessage(data.response, false, data.timestamp);
+          statusText.textContent = 'Online';
+          
+        } catch (error) {
+          console.error('Error sending message:', error);
+          removeTypingIndicator();
+          showError('Failed to get a response. Please try again.');
+          statusText.textContent = 'Error';
+        }
+      }
+      
+      // Function to handle user message submission
+      function handleSubmit() {
+        const message = userInput.value.trim();
+        
+        if (message) {
+          // Clear input
+          userInput.value = '';
+          
+          // Add user message to chat
+          addMessage(message, true);
+          
+          // Show typing indicator
+          showTypingIndicator();
+          
+          // Send to API
+          sendMessage(message);
+        }
+      }
+      
+      // Event listeners
+      sendButton.addEventListener('click', handleSubmit);
+      
+      userInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          handleSubmit();
+        }
+      });
+      
+      // Clear chat history
+      clearButton.addEventListener('click', () => {
+        // Keep only the first welcome message
+        const firstMessage = chatContainer.querySelector('.message');
+        while (chatContainer.firstChild) {
+          chatContainer.removeChild(chatContainer.firstChild);
+        }
+        chatContainer.appendChild(firstMessage);
+        
+        // Reset message history but keep the welcome message
+        messageHistory = [messageHistory[0]];
+      });
+      
+      // Add suggestion chips
+      suggestionsButton.addEventListener('click', () => {
+        const suggestions = [
+          "I need a hot water piping system",
+          "Recommend seals for 100mm pipe",
+          "What pipes can handle 6 bar pressure?",
+          "Tools needed for pipe installation"
+        ];
+        
+        // Check if suggestions already exist
+        const existingSuggestions = document.querySelector('.suggestion-chips');
+        if (existingSuggestions) {
+          existingSuggestions.remove();
+          return;
+        }
+        
+        const suggestionsDiv = document.createElement('div');
+        suggestionsDiv.className = 'suggestion-chips';
+        
+        suggestions.forEach(suggestion => {
+          const chip = document.createElement('div');
+          chip.className = 'chip';
+          chip.textContent = suggestion;
+          
+          chip.addEventListener('click', () => {
+            userInput.value = suggestion;
+            suggestionsDiv.remove();
+            handleSubmit();
+          });
+          
+          suggestionsDiv.appendChild(chip);
+        });
+        
+        // Add suggestions after the last message
+        chatContainer.appendChild(suggestionsDiv);
+        suggestionsDiv.scrollIntoView({ behavior: 'smooth' });
+      });
+      
+      // Focus input on load
+      userInput.focus();
+    });
+  </script>
+</body>
+</html>
