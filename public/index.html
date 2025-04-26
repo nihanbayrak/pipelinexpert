@@ -509,6 +509,18 @@
         statusText.textContent = 'Processing...';
         
         try {
+          // Get user data from localStorage
+          const userData = localStorage.getItem('pipelineExpertUser');
+          if (!userData) {
+            window.location.href = '/login.html';
+            return;
+          }
+          
+          const user = JSON.parse(userData);
+          
+          // Create a unique session ID if not exists
+          const currentSessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+          
           const response = await fetch('/api/chat', {
             method: 'POST',
             headers: {
@@ -516,7 +528,9 @@
             },
             body: JSON.stringify({
               message: message,
-              history: messageHistory
+              history: messageHistory,
+              sessionId: currentSessionId,
+              userId: user.id
             }),
           });
           

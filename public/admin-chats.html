@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat History - PipelineExpert</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: #f7f8fb;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      gap: 20px;
+    }
+    h1 {
+      color: #5856D6;
+      margin-top: 0;
+    }
+    .nav {
+      margin-bottom: 20px;
+    }
+    .nav a {
+      color: #5856D6;
+      text-decoration: none;
+      margin-right: 15px;
+    }
+    .sidebar {
+      width: 300px;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      align-self: flex-start;
+    }
+    .main {
+      flex: 1;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .session-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .session-item {
+      padding: 10px;
+      border-bottom: 1px solid #eee;
+      cursor: pointer;
+    }
+    .session-item:hover {
+      background-color: #f0f0f5;
+    }
+    .selected {
+      background-color: #e6e6ff;
+    }
+    .message {
+      padding: 15px;
+      margin-bottom: 10px;
+      border-radius: 10px;
+    }
+    .user-message {
+      background-color: #f0f0f5;
+      margin-left: 20%;
+    }
+    .ai-message {
+      background-color: #e6e6ff;
+      margin-right: 20%;
+    }
+    .message-time {
+      font-size: 12px;
+      color: #666;
+      margin-top: 5px;
+    }
+    .message-content {
+      white-space: pre-wrap;
+    }
+    .messages-container {
+      display: flex;
+      flex-direction: column;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="sidebar">
+      <h1>Chat Sessions</h1>
+      
+      <div class="nav">
+        <a href="admin-users.html">Manage Users</a>
+        <a href="admin-chats.html">View Chat History</a>
+      </div>
+      
+      <ul id="session-list" class="session-list">
+        <!-- Sessions will be loaded here -->
+        <li>Loading sessions...</li>
+      </ul>
+    </div>
+    <div class="main">
+      <h1>Chat Messages</h1>
+      <div id="messages-container" class="messages-container">
+        <p>Select a session to view messages</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      loadSessions();
+
+      async function loadSessions() {
+        try {
+          const response = await fetch('/api/sessions-admin');
+          const sessions = await response.json();
+          
+          const sessionList = document.getElementById('session-list');
+          sessionList.innerHTML = '';
+          
+          sessions.forEach(session => {
+            const li = document.createElement('li');
+            li.className = 'session-item';
+            const date = new Date(session.created_at);
+            
+            // Include user information
+            const displayName = session.display_name || 'Unknown User';
+            
+            li.innerHTML = `
+              <strong>${displayName}</strong><br>
+              <small>${date.toLocaleDateString()} ${date.toLocaleTimeString()}</small>
+            `;
+            
+            li.dataset.sessionId = session.session_id;
+            li.addEventListener('click', () => loadSessionMessages(session.session_id));
+            sessionList.appendChild(li);
+          });
+          
+          if (sessions.length === 0) {
+            sessionList.innerHTML = '<li>No sessions found</li>';
+          }
+        } catch (error) {
+          console.error('Error loading sessions:', error);
+        }
+      }
+
+      async function loadSessionMessages(sessionId) {
+        // Update selected session styling
+        document.querySelectorAll('.session-item').forEach(item => {
+          item.classList.remove('selected');
+        });
+        document.querySelector(`[data-session-id="${sessionId}"]`).classList.add('selected');
+        
+        try {
+          const response = await fetch(`/api/sessions/${sessionId}`);
+          const messages = await response.json();
+          
+          const messagesContainer = document.getElementById('messages-container');
+          messagesContainer.innerHTML = '';
+          
+          messages.forEach(msg => {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${msg.is_user ? 'user-message' : 'ai-message'}`;
+            
+            const time = new Date(msg.timestamp).toLocaleTimeString();
+            messageDiv.innerHTML = `
+              <div class="message-content">${msg.content}</div>
+              <div class="message-time">${time} - ${msg.is_user ? 'User' : 'AI'}</div>
+            `;
+            
+            messagesContainer.appendChild(messageDiv);
+          });
+          
+          if (messages.length === 0) {
+            messagesContainer.innerHTML = '<p>No messages in this session</p>';
+          }
+        } catch (error) {
+          console.error('Error loading messages:', error);
+        }
+      }
+    });
+  </script>
+</body>
+</html>

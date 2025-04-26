@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Management - PipelineExpert</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: #f7f8fb;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    h1 {
+      color: #5856D6;
+    }
+    .nav {
+      margin-bottom: 20px;
+    }
+    .nav a {
+      color: #5856D6;
+      text-decoration: none;
+      margin-right: 15px;
+    }
+    .user-form {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 500;
+    }
+    input {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+    button {
+      padding: 10px 15px;
+      background-color: #5856D6;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #4845c2;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    th, td {
+      padding: 12px 15px;
+      text-align: left;
+    }
+    th {
+      background-color: #5856D6;
+      color: white;
+    }
+    tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+    .delete-btn {
+      background-color: #ff375f;
+      padding: 5px 10px;
+    }
+    .delete-btn:hover {
+      background-color: #e02e50;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>User Management</h1>
+    
+    <div class="nav">
+      <a href="admin-users.html">Manage Users</a>
+      <a href="admin-chats.html">View Chat History</a>
+    </div>
+    
+    <div class="user-form">
+      <h2>Add New User</h2>
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input type="text" id="username" placeholder="Username for login">
+      </div>
+      <div class="form-group">
+        <label for="display-name">Display Name</label>
+        <input type="text" id="display-name" placeholder="Full name or company">
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="text" id="password" placeholder="Password">
+      </div>
+      <button id="add-user">Add User</button>
+      <p id="form-message"></p>
+    </div>
+    
+    <h2>User List</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Username</th>
+          <th>Display Name</th>
+          <th>Created</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="user-list">
+        <tr>
+          <td colspan="4">Loading users...</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      loadUsers();
+      
+      // Add user handler
+      document.getElementById('add-user').addEventListener('click', async () => {
+        const username = document.getElementById('username').value;
+        const displayName = document.getElementById('display-name').value;
+        const password = document.getElementById('password').value;
+        const messageElement = document.getElementById('form-message');
+        
+        if (!username || !displayName || !password) {
+          messageElement.textContent = 'All fields are required';
+          messageElement.style.color = 'red';
+          return;
+        }
+        
+        try {
+          const response = await fetch('/api/users', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ 
+              username, 
+              displayName, 
+              password 
+            })
+          });
+          
+          const data = await response.json();
+          
+          if (!response.ok) {
+            throw new Error(data.error || 'Failed to add user');
+          }
+          
+          // Clear form and show success
+          document.getElementById('username').value = '';
+          document.getElementById('display-name').value = '';
+          document.getElementById('password').value = '';
+          messageElement.textContent = 'User added successfully';
+          messageElement.style.color = 'green';
+          
+          // Reload user list
+          loadUsers();
+        } catch (error) {
+          messageElement.textContent = error.message;
+          messageElement.style.color = 'red';
+        }
+      });
+    });
+    
+    async function loadUsers() {
+      try {
+        const response = await fetch('/api/users');
+        const users = await response.json();
+        
+        const userList = document.getElementById('user-list');
+        userList.innerHTML = '';
+        
+        users.forEach(user => {
+          const row = document.createElement('tr');
+          const created = new Date(user.created_at).toLocaleString();
+          
+          row.innerHTML = `
+            <td>${user.username}</td>
+            <td>${user.display_name}</td>
+            <td>${created}</td>
+            <td>
+              <button class="delete-btn" data-id="${user.id}">Delete</button>
+            </td>
+          `;
+          
+          userList.appendChild(row);
+        });
+        
+        // Add delete handlers
+        document.querySelectorAll('.delete-btn').forEach(button => {
+          button.addEventListener('click', async (e) => {
+            if (confirm('Are you sure you want to delete this user?')) {
+              const userId = e.target.dataset.id;
+              try {
+                const response = await fetch(`/api/users/${userId}`, {
+                  method: 'DELETE'
+                });
+                
+                if (!response.ok) {
+                  throw new Error('Failed to delete user');
+                }
+                
+                // Reload user list
+                loadUsers();
+              } catch (error) {
+                alert(error.message);
+              }
+            }
+          });
+        });
+        
+        if (users.length === 0) {
+          userList.innerHTML = '<tr><td colspan="4">No users found</td></tr>';
+        }
+      } catch (error) {
+        console.error('Error loading users:', error);
+      }
+    }
+  </script>
+</body>
+</html>
